@@ -21,9 +21,9 @@ class LoginView extends StatefulWidget {
 }
 
 class _LoginViewState extends State<LoginView> {
-  final emailController = TextEditingController();
+  final emailController = TextEditingController(text: 'ckkashi007@gmail.com');
 
-  final passwordController = TextEditingController();
+  final passwordController = TextEditingController(text: '12345678');
 
   final emailFocus = FocusNode();
 
@@ -33,11 +33,6 @@ class _LoginViewState extends State<LoginView> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    FirebaseAuth.instance.idTokenChanges().listen((user) {
-      if (user != null) {
-        Navigator.pushReplacementNamed(context, HomeView.viewID);
-      }
-    });
   }
 
   @override
@@ -51,12 +46,19 @@ class _LoginViewState extends State<LoginView> {
           if (state is AuthError) {
             Utils.showSnackBar(context, state.error, AppColor.error);
           } else if (state is AuthSuccess) {
-            Utils.showSnackBar(context, state.message, AppColor.success);
+            Utils.showSnackBar(
+                context, state.message, const Color.fromRGBO(76, 175, 80, 1));
             Navigator.pushReplacementNamed(context, HomeView.viewID);
-          } 
+          }
         },
         builder: (context, state) {
           return Scaffold(
+            appBar: AppBar(
+              title: const Text(
+                appName,
+              ),
+              automaticallyImplyLeading: false,
+            ),
             bottomNavigationBar: Padding(
               padding: const EdgeInsets.only(bottom: 8.0),
               child: RichText(
@@ -117,7 +119,7 @@ class _LoginViewState extends State<LoginView> {
                       ExpandedButtonBlue(
                         title: loginString,
                         onTap: () async {
-                          authBloc.add(AuthLogin(
+                          authBloc.add(AuthLoginEvent(
                               email: emailController.text,
                               password: passwordController.text));
                         },

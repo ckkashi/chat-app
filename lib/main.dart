@@ -2,6 +2,7 @@ import 'package:chat_app/Res/colors.dart';
 import 'package:chat_app/Res/constants.dart';
 import 'package:chat_app/Res/routes.dart';
 import 'package:chat_app/View/auth/LoginView.dart';
+import 'package:chat_app/View/splash_view.dart';
 import 'package:chat_app/bloc/auth_bloc/auth_bloc.dart';
 import 'package:chat_app/firebase_options.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -19,7 +20,6 @@ void main() async {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
@@ -35,13 +35,17 @@ class MyApp extends StatelessWidget {
             primarySwatch: Colors.blue,
             backgroundColor: AppColor.light,
           ),
-          appBarTheme: const AppBarTheme(
-              centerTitle: true,
+          appBarTheme: AppBarTheme(
+              centerTitle: false,
               elevation: 0,
-              backgroundColor: AppColor.blue,
-              foregroundColor: AppColor.light),
+              backgroundColor: AppColor.light,
+              foregroundColor: AppColor.blue,
+              titleTextStyle: Theme.of(context)
+                  .textTheme
+                  .headlineMedium!
+                  .copyWith(color: AppColor.blue)),
         ),
-        initialRoute: LoginView.viewID,
+        initialRoute: SplashView.viewID,
         onGenerateRoute: Routes.generateRoute,
       ),
     );

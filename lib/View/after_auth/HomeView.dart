@@ -1,7 +1,9 @@
 import 'package:chat_app/Model/UserModel.dart';
 import 'package:chat_app/Res/colors.dart';
+import 'package:chat_app/Res/constants.dart';
 import 'package:chat_app/Res/utils.dart';
 import 'package:chat_app/View/auth/LoginView.dart';
+import 'package:chat_app/View/chat/ChatNavView.dart';
 import 'package:chat_app/bloc/auth_bloc/auth_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -15,7 +17,7 @@ class HomeView extends StatelessWidget {
   Widget build(BuildContext context) {
     final authBloc = context.read<AuthBloc>();
     final theme = Theme.of(context);
-    authBloc.add(GetUser());
+    authBloc.add(GetUserEvent());
     return SafeArea(
         child: BlocConsumer<AuthBloc, AuthState>(
       listener: (context, state) {
@@ -23,31 +25,40 @@ class HomeView extends StatelessWidget {
           userData = state.user;
         } else if (state is AuthError) {
           Utils.showSnackBar(context, state.error, AppColor.error);
-          Navigator.pushReplacementNamed(context, LoginView.viewID);
+          Navigator.pushNamedAndRemoveUntil(
+            context,
+            LoginView.viewID,
+            (route) => false,
+          );
         } else if (state is AuthUserLogout) {
           Utils.showSnackBar(context, state.message, AppColor.error);
-          Navigator.pushReplacementNamed(context, LoginView.viewID);
+          Navigator.pushNamedAndRemoveUntil(
+            context,
+            LoginView.viewID,
+            (route) => false,
+          );
         }
       },
       builder: (context, state) {
         return Scaffold(
           appBar: AppBar(
-            title: Text(
-              'DevChat',
-              style: theme.textTheme.headlineMedium,
+            title: const Text(
+              appName,
             ),
             actions: [
               IconButton(
                   onPressed: () {
                     userData = UserModel();
-                    authBloc.add(UserLogout());
+                    authBloc.add(UserLogoutEvent());
                   },
-                  icon: Icon(Icons.logout))
+                  icon: const Icon(Icons.logout))
             ],
           ),
-          body: Center(
-            child: Text('${userData.uid}'),
-          ),
+          body: state is! AuthGetUser && userData.uid != null
+              ? const Center(
+                  child: CircularProgressIndicator(),
+                )
+              : ChatNavView(),
         );
       },
     ));

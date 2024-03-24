@@ -25,3 +25,10 @@ final class AuthUserLogout extends AuthState {
   String message;
   AuthUserLogout({required this.message});
 }
+
+final class AuthSignedIn extends AuthState {
+  User user;
+  AuthSignedIn({required this.user});
+}
+
+final class AuthNotSignedIn extends AuthState {}

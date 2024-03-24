@@ -1,5 +1,7 @@
 // ignore_for_file: invalid_use_of_visible_for_testing_member
 
+import 'dart:developer';
+
 import 'package:chat_app/Model/UserModel.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
@@ -13,10 +15,21 @@ part 'auth_state.dart';
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   UserModel _userdata = UserModel();
   AuthBloc() : super(AuthInitial()) {
-    on<AuthRegister>(_onAuthRegister);
-    on<AuthLogin>(_onAuthLogin);
-    on<UserLogout>(_onUserLogout);
-    on<GetUser>(_onGetUser);
+    on<AuthRegisterEvent>(_onAuthRegister);
+    on<AuthLoginEvent>(_onAuthLogin);
+    on<UserLogoutEvent>(_onUserLogout);
+    on<GetUserEvent>(_onGetUser);
+    on<AuthSignedInEvent>(_onAuthSignedInEvent);
+    on<AuthNotSignedInEvent>(_onAuthNotSignedInEvent);
+
+    log('init');
+    FirebaseAuth.instance.idTokenChanges().listen((user) {
+      if (user != null) {
+        add(AuthSignedInEvent(user: user));
+      } else {
+        add(AuthNotSignedInEvent());
+      }
+    });
   }
 
   bool checkEmail(String email) {
@@ -41,7 +54,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   FirebaseAuth authInstance = FirebaseAuth.instance;
   FirebaseFirestore firestoreInstance = FirebaseFirestore.instance;
 
-  _onAuthRegister(AuthRegister event, Emitter<AuthState> emit) async {
+  _onAuthRegister(AuthRegisterEvent event, Emitter<AuthState> emit) async {
     String username = event.username;
     String email = event.email;
     String password = event.password;
@@ -84,7 +97,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     }
   }
 
-  _onAuthLogin(AuthLogin event, Emitter<AuthState> emit) async {
+  _onAuthLogin(AuthLoginEvent event, Emitter<AuthState> emit) async {
     String email = event.email;
     String password = event.password;
     if (email.isEmpty || password.isEmpty) {
@@ -108,24 +121,32 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     }
   }
 
-  _onUserLogout(UserLogout event, Emitter<AuthState> emit) async {
+  _onUserLogout(UserLogoutEvent event, Emitter<AuthState> emit) async {
     await authInstance.signOut().then((value) {
-      _userdata = UserModel();
       emit(AuthUserLogout(message: 'User loggedout'));
+      _userdata = UserModel();
     });
   }
 
-  _onGetUser(GetUser event, Emitter<AuthState> emit) {
+  _onGetUser(GetUserEvent event, Emitter<AuthState> emit) {
     if (_userdata.uid != null) {
       emit(AuthGetUser(user: _userdata));
     } else {
       authInstance.idTokenChanges().listen((user) async {
         if (user != null) {
+          log('user not null');
           await _getUserData(user.uid.toString());
-        } else {
-          emit(AuthError(error: 'User not loggedin'));
         }
       });
     }
+  }
+
+  _onAuthSignedInEvent(AuthSignedInEvent event, Emitter<AuthState> emit) {
+    emit(AuthSignedIn(user: event.user));
+    add(GetUserEvent());
+  }
+
+  _onAuthNotSignedInEvent(AuthNotSignedInEvent event, Emitter<AuthState> emit) {
+    emit(AuthNotSignedIn());
   }
 }

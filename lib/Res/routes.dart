@@ -3,21 +3,22 @@
 import 'package:chat_app/View/after_auth/HomeView.dart';
 import 'package:chat_app/View/auth/LoginView.dart';
 import 'package:chat_app/View/auth/RegisterView.dart';
-import 'package:chat_app/View/chat/ChatListView.dart';
+import 'package:chat_app/View/chat/ChatNavView.dart';
+import 'package:chat_app/View/splash_view.dart';
 import 'package:flutter/material.dart';
 
 class Routes {
   static Route<dynamic> generateRoute(RouteSettings settings) {
     final args = settings.arguments;
     switch (settings.name) {
+      case SplashView.viewID:
+        return MaterialPageRoute(builder: (_) => SplashView());
       case LoginView.viewID:
         return MaterialPageRoute(builder: (_) => LoginView());
       case RegisterView.viewID:
         return MaterialPageRoute(builder: (_) => RegisterView());
       case HomeView.viewID:
         return MaterialPageRoute(builder: (_) => HomeView());
-      case ChatListView.viewID:
-        return MaterialPageRoute(builder: (_) => ChatListView());
       default:
         return MaterialPageRoute(
             builder: (_) => Scaffold(

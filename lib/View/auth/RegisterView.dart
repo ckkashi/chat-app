@@ -42,6 +42,12 @@ class RegisterView extends StatelessWidget {
           //   return const CircularProgressIndicator();
           // }
           return Scaffold(
+            appBar: AppBar(
+              title: const Text(
+                appName,
+              ),
+              automaticallyImplyLeading: false,
+            ),
             bottomNavigationBar: Padding(
               padding: const EdgeInsets.only(bottom: 8.0),
               child: RichText(
@@ -56,7 +62,11 @@ class RegisterView extends StatelessWidget {
                             text: 'Login',
                             recognizer: TapGestureRecognizer()
                               ..onTap = () {
-                                Navigator.pushNamed(context, LoginView.viewID);
+                                Navigator.pushNamedAndRemoveUntil(
+                                  context,
+                                  LoginView.viewID,
+                                  (route) => false,
+                                );
                               }),
                       ])),
             ),
@@ -116,7 +126,7 @@ class RegisterView extends StatelessWidget {
                       ExpandedButtonBlue(
                           title: registerString,
                           onTap: () {
-                            authBloc.add(AuthRegister(
+                            authBloc.add(AuthRegisterEvent(
                                 username: usernameController.text,
                                 email: emailController.text,
                                 password: passwordController.text,
