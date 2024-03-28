@@ -1,13 +1,10 @@
 import 'dart:async';
-import 'dart:developer';
 
 import 'package:chat_app/Res/colors.dart';
 import 'package:chat_app/Res/constants.dart';
-import 'package:chat_app/View/after_auth/HomeView.dart';
-import 'package:chat_app/View/auth/LoginView.dart';
-import 'package:chat_app/bloc/auth_bloc/auth_bloc.dart';
+import 'package:chat_app/View/check_connectivity_view.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get/get.dart';
 
 class SplashView extends StatefulWidget {
   static const String viewID = "SplashView";
@@ -19,21 +16,17 @@ class SplashView extends StatefulWidget {
 
 class _SplashViewState extends State<SplashView> {
   @override
+  void initState() {
+    Timer(const Duration(seconds: 3), () {
+      Get.offAndToNamed(CheckConnectivityView.viewID);
+    });
+
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-        child: BlocListener<AuthBloc, AuthState>(
-      listener: (context, state) async {
-        print(state);
-        await Future.delayed(const Duration(seconds: 3));
-        if (state is AuthSignedIn) {
-          Navigator.pushNamedAndRemoveUntil(
-              context, HomeView.viewID, (route) => false);
-        } else if (state is AuthNotSignedIn) {
-          Navigator.pushNamedAndRemoveUntil(
-              context, LoginView.viewID, (route) => false);
-        }
-      },
       child: Scaffold(
         body: Container(
           width: double.infinity,
@@ -67,6 +60,6 @@ class _SplashViewState extends State<SplashView> {
           ),
         ),
       ),
-    ));
+    );
   }
 }
